@@ -1,0 +1,13 @@
+[package]
+name = "nmvi"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+networkmanager = "0.5.0"
+dbus = "0.9.0"
+ratatui = { version = "0.29.0", features = ["unstable"] }
+tokio = {version = "1.46.1", features = ["full"] }
+anyhow = "1.0.98"
+tui-big-text = "0.7.1"
+
