@@ -1,7 +1,11 @@
 use crate::{
     event::Event,
     input::collector::{CollectorHandle, start_collector},
-    state::{Mode, State},
+    state::{Mode, Page, State},
+    ui::{
+        command_input::render_command_input, header::render_header, layout::main_layout,
+        main_block::render_main_block,
+    },
 };
 use ratatui::{
     prelude::*,
@@ -11,15 +15,15 @@ use ratatui::{
 use tokio::sync::mpsc;
 use tui_big_text::{BigText, PixelSize};
 
-pub struct App {
-    state: State,
+pub struct App<'a> {
+    state: State<'a>,
     collector_handle: CollectorHandle,
     event_sender: mpsc::Sender<Event>,
     event_receiver: mpsc::Receiver<Event>,
 }
 
-impl App {
-    pub fn new() -> App {
+impl<'a> App<'a> {
+    pub fn new() -> App<'a> {
         let (event_sender, event_receiver) = mpsc::channel(256);
         let collector_handle = start_collector(event_sender.clone());
         Self {
@@ -39,36 +43,10 @@ impl App {
     }
 
     fn draw(&self, frame: &mut Frame) {
-        let layout = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints(vec![
-                Constraint::Length(10),
-                Constraint::Length(3),
-                Constraint::Fill(1),
-            ])
-            .split(frame.area());
-
-        let title_block = Block::new().padding(Padding::uniform(1));
-        let title = BigText::builder()
-            .pixel_size(PixelSize::Full)
-            .lines(vec!["NMVI".fg(Color::Rgb(255, 204, 0)).into()])
-            .alignment(Alignment::Center)
-            .build();
-
-        frame.render_widget(title, title_block.inner(layout[0]));
-
-        let cmd_block = Block::bordered().border_style(Style::new().fg(Color::Rgb(235, 91, 0)));
-        frame.render_widget(cmd_block.clone(), layout[1]);
-
-        let cmd = Line::from(self.state.command_buffer.clone());
-        frame.render_widget(cmd, cmd_block.inner(layout[1]));
-
-        let mode = Line::from(self.state.mode.to_string());
-        let block = Block::bordered()
-            .title_bottom(mode.left_aligned())
-            .border_set(border::THICK)
-            .fg(Color::White);
-        frame.render_widget(block, layout[2]);
+        let layout = main_layout(frame.area());
+        render_header(frame, layout[0]);
+        render_command_input(self.state.command_buffer.clone(), frame, layout[1]);
+        render_main_block(frame, self.state.mode, layout[2]);
     }
 
     async fn handle_event(&mut self) {
@@ -103,5 +81,11 @@ impl App {
     async fn handle_command(&mut self) {
         let event = self.state.command_buffer.parse().unwrap();
         self.event_sender.send(event).await.unwrap();
+    }
+
+    async fn change_page(&mut self, page: Page) {
+        match page {
+            Page::Devices => todo!(),
+        }
     }
 }
