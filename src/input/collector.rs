@@ -75,8 +75,8 @@ fn handle_request(request: Request, state: &mut State) {
 async fn handle_input(mapper: &dyn EventMapper, event_sender: mpsc::Sender<Event>) {
     if crossterm::event::poll(Duration::from_millis(100)).unwrap() {
         if let crossterm::event::Event::Key(key) = event::read().unwrap() {
-            if let Some(event) = mapper.map_from_key(key) {
-                event_sender.send(event).await.unwrap();
+            for e in mapper.map_from_key(key) {
+                event_sender.send(e).await.unwrap()
             }
         }
     }

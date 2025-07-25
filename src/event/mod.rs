@@ -17,7 +17,7 @@ impl FromStr for Event {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "q" | "wq" | "q!" | "wq!" => Ok(Self::Exit),
+            ":q" | ":wq" | ":q!" | ":wq!" => Ok(Self::Exit),
             _ => bail!("invalid event"),
         }
     }

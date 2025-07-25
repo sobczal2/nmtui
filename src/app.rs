@@ -60,15 +60,7 @@ impl App {
         let cmd_block = Block::bordered().border_style(Style::new().fg(Color::Rgb(235, 91, 0)));
         frame.render_widget(cmd_block.clone(), layout[1]);
 
-        let cmd = Line::from(format!(
-            "{}{}",
-            if self.state.mode == Mode::Command {
-                ":"
-            } else {
-                ""
-            },
-            self.state.command_buffer.clone()
-        ));
+        let cmd = Line::from(self.state.command_buffer.clone());
         frame.render_widget(cmd, cmd_block.inner(layout[1]));
 
         let mode = Line::from(self.state.mode.to_string());
