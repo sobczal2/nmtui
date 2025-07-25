@@ -2,8 +2,9 @@ use app::App;
 use tui::{setup_terminal, shutdown_terminal};
 
 mod app;
-mod command;
 mod event;
+mod input;
+mod state;
 mod tui;
 
 #[tokio::main]
